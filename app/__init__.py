@@ -1,21 +1,23 @@
 from flask import Flask
 from flask_cors import CORS
 from dotenv import load_dotenv
-# from .config import Config
 from .models import db
 from .schemas import ma
+from .routes import setup_routes
 import os
 
 
-load_dotenv()
+def create_app(env):
+    load_dotenv(f'.env.{env}')
+    
+    app = Flask(__name__)
 
-app = Flask(__name__)
-CORS(app)
+    CORS(app)
 
-# app.config.from_object(Config)
-app.config.from_object(os.getenv('APP_SETTINGS'))
+    app.config.from_object(os.getenv('APP_SETTINGS'))
 
-db.init_app(app)
-ma.init_app(app)
+    db.init_app(app)
+    ma.init_app(app)
 
-from .routes import *
+    setup_routes(app)
+    return app
